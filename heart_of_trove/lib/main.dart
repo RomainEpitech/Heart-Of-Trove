@@ -122,38 +122,81 @@ class _LiveMapPageState extends State<LiveMapPage> {
     return Scaffold(
       body: _currentPosition == null
           ? const Center(child: CircularProgressIndicator())
-          : FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                initialCenter: _currentPosition!,
-                initialZoom: 17,
-                interactionOptions: const InteractionOptions(),
-              ),
+          : Stack(
               children: [
-                TileLayer(
-                  urlTemplate:
-                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: const ['a', 'b', 'c'],
-                  userAgentPackageName: 'com.example.app',
-                  tileProvider: NetworkTileProvider(),
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      width: 60,
-                      height: 60,
-                      point: _currentPosition!,
-                      child: Transform.rotate(
-                        angle: _heading * math.pi / 180,
-                        child: Icon(
-                          Icons.navigation,
-                          size: 40,
-                          color: Colors.blue.shade700,
+                FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    initialCenter: _currentPosition!,
+                    initialZoom: 17,
+                    interactionOptions: const InteractionOptions(),
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+                      subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
+                      userAgentPackageName: 'com.example.app',
+                      tileProvider: NetworkTileProvider(),
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          width: 60,
+                          height: 60,
+                          point: _currentPosition!,
+                          child: Transform.rotate(
+                            angle: _heading * math.pi / 180,
+                            child: Icon(
+                              Icons.navigation,
+                              size: 40,
+                              color: Colors.blue.shade700,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
+
+                Positioned(
+                  bottom: 30,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(30),
+                          onTap: () {
+                            if (_currentPosition != null) {
+                              _mapController.move(_currentPosition!, _mapController.zoom);
+                            }
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Icon(
+                              Icons.my_location,
+                              color: Colors.black87,
+                              size: 28,
+                            ),
+                          ),
+                        )
+                      )
+                    )
+                  )
+                )
               ],
             ),
     );
